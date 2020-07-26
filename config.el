@@ -101,3 +101,17 @@
       "t F" #'velcro-cycle-font
       :desc "Cycle theme"
       "t T" #'velcro-cycle-theme)
+
+(defun scribble-render-and-open ()
+  "Render Scribble document to HTML and open in browser"
+  (interactive)
+  (shell-command
+   (format "scribble +m --html %s && open %s.html"
+           (shell-quote-argument (buffer-file-name))
+           (file-name-sans-extension (buffer-file-name))))
+  )
+
+(map! :map scribble-mode-map
+      :leader
+      :desc "Scribble → HTML & open"
+      :n "r h" #'scribble-render-and-open)
