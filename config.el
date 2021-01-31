@@ -211,3 +211,50 @@
       :leader
       :desc "Scribble → HTML & open"
       :n "r h" #'scribble-render-and-open)
+
+;; Theme-adaptive splash-screen image
+;;  (Adapted from https://github.com/tecosaur/emacs-config/blob/master/config.org#splash-screen)
+
+(defvar fancy-splash-image-template
+  (expand-file-name "mark.svg" doom-private-dir)
+  "Default template SVG used for the splash image")
+
+(defvar fancy-splash-color-to-substitute
+  "#3A3427"
+  "Color in SVG splash image to substitute for appropriate theme color")
+
+(defvar fancy-splash-default-color
+  "#41BF75" ;; greenish
+  "A default color to use if doom-color is 'nil")
+
+(unless (file-exists-p (expand-file-name "theme-splashes" doom-cache-dir))
+  (make-directory (expand-file-name "theme-splashes" doom-cache-dir) t))
+
+(defun fancy-splash-filename (theme-name)
+  (expand-file-name (concat (file-name-as-directory "theme-splashes")
+                            theme-name)
+                    doom-cache-dir))
+
+(defun fancy-splash-clear-cache ()
+  "Delete all cached fancy splash images"
+  (interactive)
+  (delete-directory (expand-file-name "theme-splashes" doom-cache-dir) t)
+  (message "Cache cleared!"))
+
+(defun ensure-splash-theme-image-exists ()
+  "If needed, create an SVG splash screen using a color from the current theme"
+  (unless (file-exists-p (fancy-splash-filename (symbol-name doom-theme)))
+    (with-temp-buffer
+      (insert-file-contents fancy-splash-image-template)
+      (while (re-search-forward fancy-splash-color-to-substitute nil t)
+        (replace-match (or (doom-color 'keywords) fancy-splash-default-color) nil nil))
+      (write-region nil nil (fancy-splash-filename (symbol-name doom-theme)) nil nil))))
+
+(defun set-appropriate-splash (&rest _)
+  (ensure-splash-theme-image-exists)
+  (setq +doom-dashboard-banner-padding '(1 . 1))
+  (setq fancy-splash-image (fancy-splash-filename (symbol-name doom-theme)))
+  (+doom-dashboard-reload))
+
+(add-hook 'window-size-change-functions #'set-appropriate-splash)
+(add-hook 'doom-load-theme-hook #'set-appropriate-splash)
