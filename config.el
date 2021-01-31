@@ -34,7 +34,7 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type nil)
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
@@ -55,7 +55,6 @@
 
 (use-package! racket-mode
   :mode "\\.rkt\\'"
-  :magic "#lang racket"
   :config
   (company-mode)
   (rainbow-delimiters-mode))
@@ -65,8 +64,8 @@
   (global-diff-hl-mode))
 
 ;; I can never get these to work quite properly when I try to “defer” them in any way
-(use-package! pollen-mode)
-(use-package! company-pollen)
+;(use-package! pollen-mode)
+;(use-package! company-pollen)
 
 (setq initial-frame-alist '((top . 0) (left . 0) (width . 106) (height . 90)))
 (custom-set-faces!
