@@ -11,6 +11,8 @@
 (package! scribble-mode)
 (package! diff-hl)
 (package! almost-mono-themes)
+(package! twilight-bright-theme
+  :recipe (:host github :repo "Bogdanp/twilight-bright-theme.el"))
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;(package! some-package)
