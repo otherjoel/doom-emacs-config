@@ -53,11 +53,102 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+;; Linting ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package flycheck
+  :hook ((prog-mode . flycheck-mode))
+  :config
+  (setq-default
+   flycheck-standard-error-navigation nil  ;; prevent flycheck from rebinding next-error (M-g n)
+   flycheck-disabled-checkers '(python-pycompile racket sass scheme-chicken)
+   flycheck-emacs-lisp-load-path 'inherit
+   flycheck-flake8rc "setup.cfg"))
+
 (use-package! racket-mode
   :mode "\\.rkt\\'"
+  :after flycheck
+  :preface
+  (defun bp-insert-lisp-section (section)
+    "Insert a LISP section header with SECTION at point."
+    (interactive "sSection: ")
+    (let ((suffix (s-repeat (- 72 (length section) 4) ";")))
+      (insert (format ";; %s %s\n" section suffix))))
+  (defvar bp-racket-defun-likes
+    '(call-with-browser!
+      call-with-browser-script!
+      call-with-database-connection
+      call-with-database-transaction
+      call-with-element-screenshot!
+      call-with-input-bytes
+      call-with-input-string
+      call-with-marionette!
+      call-with-page!
+      call-with-page-screenshot!
+      call-with-persistent-database-connection
+      call-with-pk
+      call-with-pool-connection
+      call-with-postmark-connection
+      call-with-pubsub-events
+      call-with-redis
+      call-with-redis-client
+      call-with-redis-pool
+      call-with-redis-pubsub
+      call-with-screenshot
+      call-with-semaphore
+      call-with-test-client+server
+      call-with-transaction
+      call-with-twilio-connection
+      call-with-unzip
+      for/stream
+      form*
+      gen:let
+      let*
+      let-globals
+      place
+      property
+      section
+      serializable-struct
+      serializable-struct/versions
+      struct++
+      system-test-suite
+      test
+      test-commands
+      tpl:xexpr-when
+      xexpr-unless
+      xexpr-when))
+
+  (defun bp-racket-mode-hook ()
+    (interactive)
+    (setq adaptive-fill-mode t))
   :config
-  (company-mode)
-  (rainbow-delimiters-mode))
+  (add-hook 'racket-mode-hook #'bp-racket-mode-hook)
+
+  (flycheck-define-checker racket-review
+    "check racket source code using racket-review"
+    :command ("raco" "review" source)
+    :error-patterns
+    ((error line-start (file-name) ":" line ":" column ":error:" (message) line-end)
+     (warning line-start (file-name) ":" line ":" column ":warning:" (message) line-end))
+    :modes racket-mode)
+
+  (add-to-list 'flycheck-checkers 'racket-review)
+
+  (setq racket-repl-buffer-name-function #'racket-repl-buffer-name-project
+        racket-show-functions '(racket-show-echo-area))
+
+  (dolist (id bp-racket-defun-likes)
+    (put id 'racket-indent-function #'defun))
+
+  :bind (:map racket-mode-map
+              ("{"       . paredit-open-curly)
+              ("}"       . paredit-close-curly)
+              ("C-c C-d" . racket-xp-describe)
+              ("C-c C-r" . racket-xp-rename)
+              ("C-c C-s" . bp-insert-lisp-section)
+              ("C-c ."   . racket-xp-visit-definition)
+              ("C-c ,"   . racket-unvisit)))
+
+(use-package racket-xp-mode
+  :hook racket-mode)
 
 (use-package! diff-hl
   :config
