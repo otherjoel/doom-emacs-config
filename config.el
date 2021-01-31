@@ -3,6 +3,11 @@
 (setq user-full-name "Joel Dueck"
       user-mail-address "joel@jdueck.net")
 
+;; Terminex is an IBM Plex Mono that includes box/line characters and slashed zero
+;; https://github.com/vsalvino/terminex
+(defvar velcro-fonts '("Terminex" "Rec Mono SemiCasual" "Triplicate T4c"))
+
+(defvar velcro-themes '(twilight-bright almost-mono-white doom-one))
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
 ;;
@@ -15,12 +20,13 @@
 ;; font string. You generally only need these two:
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
-(setq doom-font (font-spec :family "IBM Plex Mono" :size 15))
+(setq doom-font (font-spec :family (car velcro-fonts) :size 16 :weight 'normal)
+      doom-variable-pitch-font (font-spec :family "Source Sans Pro"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme (car velcro-themes))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -81,16 +87,16 @@
  :i "M-_" "—"
  :i "M-;" "…")
 
-(defvar velcro-fonts '("Rec Mono SemiCasual" "IBM Plex Mono" "Triplicate T4c"))
-(defvar velcro-themes '(doom-one almost-mono-white))
-
 (defun make-cycler (lst func)
   (let ((counter 0))
     (function (lambda ()
       (setq counter (1+ counter))
       (funcall func (nth (mod counter (length lst)) lst))))))
 
-(defvar cycle-font (make-cycler velcro-fonts #'set-frame-font))
+(defvar velcro-fontspecs
+  (mapcar (lambda (f) (font-spec :family f :weight 'normal)) velcro-fonts))
+
+(defvar cycle-font (make-cycler velcro-fontspecs #'set-frame-font))
 (defvar cycle-theme (make-cycler velcro-themes #'load-theme))
 
 (defun velcro-cycle-font () (interactive) (funcall cycle-font))
