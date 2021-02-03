@@ -139,13 +139,21 @@
     (put id 'racket-indent-function #'defun))
 
   :bind (:map racket-mode-map
-              ("{"       . paredit-open-curly)
-              ("}"       . paredit-close-curly)
-              ("C-c C-d" . racket-xp-describe)
-              ("C-c C-r" . racket-xp-rename)
-              ("C-c C-s" . bp-insert-lisp-section)
-              ("C-c ."   . racket-xp-visit-definition)
-              ("C-c ,"   . racket-unvisit)))
+         ("{"       . paredit-open-curly)
+         ("}"       . paredit-close-curly)
+         ("C-c C-d" . racket-xp-describe)
+         ("C-c C-r" . racket-xp-rename)
+         ("C-c C-s" . bp-insert-lisp-section)
+         ("C-c ."   . racket-xp-visit-definition)
+         ("C-c ,"   . racket-unvisit)))
+
+(map! :map racket-mode-map
+      :leader
+      (:prefix-map ("r" . "Racket")
+       :desc "Tidy requires"
+       :n "t" #'racket-tidy-requires
+       :desc "Trim+tidy requires"
+       :n "T" #'racket-trim-requires))
 
 (use-package racket-xp-mode
   :hook racket-mode)
