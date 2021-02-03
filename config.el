@@ -194,9 +194,9 @@
 
 (map! :leader
       :desc "Cycle font"
-      "t F" #'velcro-cycle-font
+      :n "t F" #'velcro-cycle-font
       :desc "Cycle theme"
-      "t T" #'velcro-cycle-theme)
+      :n "t T" #'velcro-cycle-theme)
 
 (defun scribble-render-and-open ()
   "Render Scribble document to HTML and open in browser"
